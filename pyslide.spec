@@ -39,7 +39,7 @@ mo¿liwo¶ci pyslide.
 
 %build
 CFLAGS="%{rpmcflags}"
-export CLFAGS
+export CFLAGS
 BUILD_EXT=1 python setup.py build
 
 %install
