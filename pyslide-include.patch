@@ -1,0 +1,238 @@
+diff -uNr pyslide-0.2.org/extras/cmisc.c pyslide-0.2/extras/cmisc.c
+--- pyslide-0.2.org/extras/cmisc.c	2004-01-02 23:48:50.000000000 +0100
++++ pyslide-0.2/extras/cmisc.c	2004-01-04 13:05:17.000000000 +0100
+@@ -23,7 +23,7 @@
+  */
+ 
+ #define NO_PYGAME_C_API
+-#include "pygame.h"
++#include <pygame/pygame.h>
+ 
+ static PyObject* Pygame_SurfaceType;
+ 
+diff -uNr pyslide-0.2.org/extras/cmisc.c.orig pyslide-0.2/extras/cmisc.c.orig
+--- pyslide-0.2.org/extras/cmisc.c.orig	1970-01-01 01:00:00.000000000 +0100
++++ pyslide-0.2/extras/cmisc.c.orig	2004-01-02 23:48:50.000000000 +0100
+@@ -0,0 +1,222 @@
++/*
++ * 
++ * Copyright (C) 2003 Ayose Cazorla León
++ * 
++ * Authors
++ *       Ayose Cazorla <ayose.cazorla@hispalinux.es>
++ * 
++ * This file is part of Pyslide.
++ * 
++ * Pyslide is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * Pyslide is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with Pyslide; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ */
++
++#define NO_PYGAME_C_API
++#include "pygame.h"
++
++static PyObject* Pygame_SurfaceType;
++
++/* set_alpha
++ * 
++ * This function was based on the pygame.surfarraw.pixels_alpha
++ */
++static char set_alpha_doc[] = 
++    "set_alpha(surface, new_alpha) -> None\n\n"
++    "Change the alpha of the surface.\nThis changes all the pixels\n\n"
++    "This is something like\n\n"
++    "   for pixel in pixels:\n"
++    "       pixel.alpha *= new_alpha\n";
++
++static PyObject *
++set_alpha(PyObject *self, PyObject *args)
++{
++    SDL_Surface* surface;
++    PyObject *surfobj;
++    Uint8 *pixels;
++    int len, x, offset;
++    double alpha_multiply;
++
++    if(!PyArg_ParseTuple(args, "O!d", Pygame_SurfaceType, &surfobj, &alpha_multiply))
++        return NULL;
++
++    surface = PySurface_AsSurface(surfobj);
++
++    if(surface->format->BytesPerPixel != 4)
++        return RAISE(PyExc_ValueError, "unsupport bit depth for alpha array");
++
++    SDL_LockSurface(surface);
++
++    if(surface->format->Amask == 0xff<<24)
++        offset = SDL_BYTEORDER == SDL_LIL_ENDIAN ? 3 : 0;
++    else if(surface->format->Amask == 0xff)
++        offset = SDL_BYTEORDER == SDL_LIL_ENDIAN ? 0 : 3;
++    else {
++        SDL_UnlockSurface(surface);
++        return RAISE(PyExc_ValueError, "unsupport colormasks for alpha reference array");
++    }
++
++    pixels = (Uint8*)surface->pixels;
++    len = surface->w * surface->h * 4;
++    for (x = 0; x < len; x += 4)
++        pixels[x+offset] = (Uint8)(pixels[x+offset] * alpha_multiply);
++
++    SDL_UnlockSurface(surface);
++    Py_INCREF(Py_None);
++    return Py_None;
++}
++
++/*
++ * set_valpha
++ */
++static char set_valpha_doc[] = "set_valpha(surface, new_alpha, limit) -> None\n";
++
++static PyObject *
++set_valpha(PyObject *self, PyObject *args)
++{
++    SDL_Surface* surface;
++    PyObject *surfobj;
++    Uint8 *pixels;
++    int x, y, w, h, limit, offset;
++    double alpha;
++
++    if(!PyArg_ParseTuple(args, "O!i", Pygame_SurfaceType, &surfobj, &limit))
++        return NULL;
++
++    surface = PySurface_AsSurface(surfobj);
++
++    if(surface->format->BytesPerPixel != 4)
++        return RAISE(PyExc_ValueError, "unsupport bit depth for alpha array");
++
++    SDL_LockSurface(surface);
++
++    if(surface->format->Amask == 0xff<<24)
++        offset = SDL_BYTEORDER == SDL_LIL_ENDIAN ? 3 : 0;
++    else if(surface->format->Amask == 0xff)
++        offset = SDL_BYTEORDER == SDL_LIL_ENDIAN ? 0 : 3;
++    else {
++        SDL_UnlockSurface(surface);
++        return RAISE(PyExc_ValueError, "unsupport colormasks for alpha reference array");
++    }
++
++    w = surface->w * 4;
++    h = surface->h;
++    pixels = (Uint8*)surface->pixels + max(0, limit - 100)*w;
++    for (y = max(0, limit - 100); y < h; y++)
++    {
++        //printf(" - %d\n", y);
++        if (y > limit)
++        {
++            for (x = 0; x < w; x+=4)
++                pixels[x+offset] = 0;
++        } else
++        {
++            alpha = (limit - y) / 100.;
++            for (x = 0; x < w; x+=4)
++                pixels[x+offset] = (Uint8)(pixels[x+offset] * alpha);
++        }
++
++        pixels += w;
++    }
++
++    SDL_UnlockSurface(surface);
++    Py_INCREF(Py_None);
++    return Py_None;
++}
++
++/*
++ * set_halpha
++ */
++static char set_halpha_doc[] = "set_halpha(surface, new_alpha, limit) -> None\n";
++
++static PyObject *
++set_halpha(PyObject *self, PyObject *args)
++{
++    SDL_Surface* surface;
++    PyObject *surfobj;
++    Uint8 *pixels;
++    int x, y, w, h, limit, start, offset;
++
++    if(!PyArg_ParseTuple(args, "O!i", Pygame_SurfaceType, &surfobj, &limit))
++        return NULL;
++
++    surface = PySurface_AsSurface(surfobj);
++
++    if(surface->format->BytesPerPixel != 4)
++        return RAISE(PyExc_ValueError, "unsupport bit depth for alpha array");
++
++    SDL_LockSurface(surface);
++
++    if(surface->format->Amask == 0xff<<24)
++        offset = SDL_BYTEORDER == SDL_LIL_ENDIAN ? 3 : 0;
++    else if(surface->format->Amask == 0xff)
++        offset = SDL_BYTEORDER == SDL_LIL_ENDIAN ? 0 : 3;
++    else {
++        SDL_UnlockSurface(surface);
++        return RAISE(PyExc_ValueError, "unsupport colormasks for alpha reference array");
++    }
++
++    pixels = (Uint8*)surface->pixels;
++    w = surface->w * 4;
++    h = surface->h;
++    limit *= 4;
++    start = max(0, limit - 100);
++    for (y = 0; y < h; y++)
++    {
++        for (x = start; x < w; x+=4)
++        {
++            if (x > limit)
++                pixels[x+offset] = 0;
++            else
++                pixels[x+offset] = (Uint8)(pixels[x+offset] * ((limit - x) / 100.));
++        }
++
++        pixels += w;
++    }
++
++    SDL_UnlockSurface(surface);
++    Py_INCREF(Py_None);
++    return Py_None;
++}
++
++static PyMethodDef SetAlphaMethods[] = {
++    {"set_alpha",  set_alpha, METH_VARARGS, set_alpha_doc},
++    {"set_valpha",  set_valpha, METH_VARARGS, set_valpha_doc},
++    {"set_halpha",  set_halpha, METH_VARARGS, set_halpha_doc},
++    {NULL, NULL, 0, NULL}        /* Sentinel */
++};
++
++void initcmisc(void)
++{
++    PyObject *module;
++    PyObject *pygame_surface;
++    PyObject *dict;
++
++    /* I need the pygame.surface.Surface type
++     */
++
++    if((pygame_surface = PyImport_ImportModule("pygame.surface")) == NULL)
++        return;
++
++    dict = PyModule_GetDict(pygame_surface);
++    if((Pygame_SurfaceType = PyDict_GetItemString(dict, "Surface")) == NULL)
++    {
++        RAISE(PyExc_AttributeError, "pygame.surface module has no attribute 'Surface'");
++        return;
++    }
++
++    Py_INCREF(Pygame_SurfaceType);
++    Py_DECREF(pygame_surface);
++    module = Py_InitModule("cmisc", SetAlphaMethods);
++}
++
