@@ -1,13 +1,12 @@
 Summary:	A tiny program to make presentations
 Summary(pl):	Malutki program do robienia prezentacji
 Name:		pyslide
-Version:	0.2
+Version:	0.3
 Release:	1
 License:	GPL
 Group:		Applications/Multimedia
 Source0:	http://www.hispalinux.es/~setepo/pyslide/%{name}-%{version}.tar.gz
-# Source0-md5:	cdb7336ec2507e698646a5aa901f0fde
-Patch0:		%{name}-include.patch
+# Source0-md5:	a16d4048c7b3405cf4ef7ef94ec3f2d8
 URL:		http://www.hispalinux.es/~setepo/pyslide/
 BuildRequires:	python-modules >= 2.3
 BuildRequires:	python-pygame-devel
@@ -35,7 +34,6 @@ mo¿liwo¶ci pyslide.
 
 %prep
 %setup -q
-%patch0 -p1
 
 %build
 CFLAGS="%{rpmcflags}"
