@@ -11,6 +11,8 @@ Patch0:		%{name}-include.patch
 URL:		http://www.hispalinux.es/~setepo/pyslide/
 BuildRequires:	python-modules >= 2.3
 BuildRequires:	python-pygame-devel
+Requires:	python-pygame
+Requires:	python-PyXML
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
