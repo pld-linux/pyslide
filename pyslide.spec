@@ -1,13 +1,14 @@
 Summary:	A tiny program to make presentations
 Summary(pl):	Malutki program do robienia prezentacji
 Name:		pyslide
-Version:	0.3
+Version:	0.4
 Release:	1
 License:	GPL
 Group:		Applications/Multimedia
 Source0:	http://www.hispalinux.es/~setepo/pyslide/%{name}-%{version}.tar.gz
-# Source0-md5:	a16d4048c7b3405cf4ef7ef94ec3f2d8
+# Source0-md5:	68b158ad104cd24dc2cb7cc1f65f27f1
 URL:		http://www.hispalinux.es/~setepo/pyslide/
+Patch0:		%{name}-locale.patch
 BuildRequires:	python-modules >= 2.3
 BuildRequires:	python-pygame-devel
 Requires:	python-pygame
@@ -33,7 +34,8 @@ sk³adnia jest bardzo prosta. Za³±czone przyk³ady pokazuj± wszystkie
 mo¿liwo¶ci pyslide.
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}.orig
+%patch0 -p1
 
 %build
 CFLAGS="%{rpmcflags}"
@@ -48,7 +50,11 @@ install examples/* $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 install %{name}.1 $RPM_BUILD_ROOT%{_mandir}/man1
 
 BUILD_EXT=1 python setup.py install \
-   --root=$RPM_BUILD_ROOT --optimize=2
+   --root=$RPM_BUILD_ROOT \
+   --optimize=2 \
+   --install-lib=%{py_sitescriptdir}
+
+find $RPM_BUILD_ROOT%{py_sitescriptdir} -type f -name "*.py" | xargs rm
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -60,6 +66,4 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{name}.1*
 %dir %{_examplesdir}/%{name}-%{version}
 %{_examplesdir}/%{name}-%{version}/*
-%dir %{py_sitedir}/Pyslide
-%{py_sitedir}/Pyslide/*.so
-%{py_sitedir}/Pyslide/*.py[co]
+%{py_sitescriptdir}/Pyslide
