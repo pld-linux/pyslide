@@ -50,9 +50,9 @@ install examples/* $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 install %{name}.1 $RPM_BUILD_ROOT%{_mandir}/man1
 
 BUILD_EXT=1 python setup.py install \
-   --root=$RPM_BUILD_ROOT \
-   --optimize=2 \
-   --install-lib=%{py_sitescriptdir}
+	--root=$RPM_BUILD_ROOT \
+	--optimize=2 \
+	--install-lib=%{py_sitescriptdir}
 
 find $RPM_BUILD_ROOT%{py_sitescriptdir} -type f -name "*.py" | xargs rm
 
