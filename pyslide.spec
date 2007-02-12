@@ -1,5 +1,5 @@
 Summary:	A tiny program to make presentations
-Summary(pl):	Malutki program do robienia prezentacji
+Summary(pl.UTF-8):   Malutki program do robienia prezentacji
 Name:		pyslide
 Version:	0.4
 Release:	1
@@ -24,14 +24,14 @@ brief description in the README file. The vocabulary is very easy, and
 there are examples in the distribution where all of the features are
 shown.
 
-%description -l pl
-Pyslide jest ma³ym programem do robienia prezentacji. U¿ywa SDL
-(poprzez pygame) w celu uzyskania ciekawych efektów graficznych.
-Prezentacje s± tworzone w plikach XML. Mog± one byæ kompilowane do
-kodu Pythona. Na t± chwilê nie ma dokumentu dok³adnie opisuj±cego
-sk³adniê opisu prezentacji. Krótki opis znajduje siê w pliku README -
-sk³adnia jest bardzo prosta. Za³±czone przyk³ady pokazuj± wszystkie
-mo¿liwo¶ci pyslide.
+%description -l pl.UTF-8
+Pyslide jest maÅ‚ym programem do robienia prezentacji. UÅ¼ywa SDL
+(poprzez pygame) w celu uzyskania ciekawych efektÃ³w graficznych.
+Prezentacje sÄ… tworzone w plikach XML. MogÄ… one byÄ‡ kompilowane do
+kodu Pythona. Na tÄ… chwilÄ™ nie ma dokumentu dokÅ‚adnie opisujÄ…cego
+skÅ‚adniÄ™ opisu prezentacji. KrÃ³tki opis znajduje siÄ™ w pliku README -
+skÅ‚adnia jest bardzo prosta. ZaÅ‚Ä…czone przykÅ‚ady pokazujÄ… wszystkie
+moÅ¼liwoÅ›ci pyslide.
 
 %prep
 %setup -q -n %{name}-%{version}.orig
