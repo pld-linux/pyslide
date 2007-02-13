@@ -1,5 +1,5 @@
 Summary:	A tiny program to make presentations
-Summary(pl.UTF-8):   Malutki program do robienia prezentacji
+Summary(pl.UTF-8):	Malutki program do robienia prezentacji
 Name:		pyslide
 Version:	0.4
 Release:	1
